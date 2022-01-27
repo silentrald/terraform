@@ -1,0 +1,37 @@
+name: Create terraform plan
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  Plan-Lambda-Function:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository content
+        uses: actions/checkout@v2
+
+      - name: Create lambda.zip
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -t .
+          zip -r lambda.zip * -x "bin/*" requirements.txt setup.cfg
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.14.6
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.x
+
+      - name: Install Golang Modules
+        run: go mod tidy
+        working-directory: ./terratest
+
+      - name: Test Terraform Code
+        run: go test s3_test.go
+        working-directory: ./terratest

@@ -25,11 +25,11 @@ jobs:
 
       - name: Install Golang Modules
         run: go mod tidy
-        working-directory: ./terratest
+        working-directory: ./test
 
       - name: Test Terraform Code
         run: go test s3_test.go
         env:
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
-        working-directory: ./terratest
+        working-directory: ./test

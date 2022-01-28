@@ -31,7 +31,7 @@ func TestTerraformAwsS3(t *testing.T) {
 	// terraform testing.
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		// The path to where our Terraform code is located
-		TerraformDir: "../terraform",
+		TerraformDir: "../",
 
 		// Variables to pass to our Terraform code using -var options
 		Vars: map[string]interface{}{
@@ -50,7 +50,8 @@ func TestTerraformAwsS3(t *testing.T) {
 
 	// Run `terraform output` to get the value of an output variable
 	bucketId := terraform.Output(t, terraformOptions, "bucket_id")
-	
+	timestamp := terraform.Output(t, terraformOptions, "timestamp")
+
 	// Check if the bucket exist
 	aws.AssertS3BucketExists(t, awsRegion, bucketId)
 	t.Logf("Bucket Id: %s", bucketId)
@@ -64,5 +65,7 @@ func TestTerraformAwsS3(t *testing.T) {
 	t.Logf("text1.txt: %s", text1)
 	t.Logf("text2.txt: %s", text2)
 
-	assert.Equal(t, text1, text2)
+	// Check if the contents are the same with the timestamp log
+	assert.Equal(t, text1, timestamp)
+	assert.Equal(t, text2, timestamp)
 }
